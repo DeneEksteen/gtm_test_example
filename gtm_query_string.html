@@ -17,22 +17,40 @@
 <body>
     <h1>Google Tag Manager Query String Test</h1>
     <p>Check the GTM Data Layer for pushed values.</p>
+    <button onclick="sendApiRequest()">Send API Request</button>
 
     <script>
+        let queryKey = "";
+        let queryValue = "";
+
         // Function to get URL parameters and push to GTM Data Layer
         function getQueryParams() {
             const params = new URLSearchParams(window.location.search);
-            const key = params.get('key');
-            const value = params.get('value');
-            if (key && value) {
+            queryKey = params.get('key');
+            queryValue = params.get('value');
+            if (queryKey && queryValue) {
                 window.dataLayer = window.dataLayer || [];
                 window.dataLayer.push({
                     'event': 'queryParamsCaptured',
-                    'queryKey': key,
-                    'queryValue': value
+                    'queryKey': queryKey,
+                    'queryValue': queryValue
                 });
-                console.log("Data Layer Updated: ", { 'queryKey': key, 'queryValue': value });
+                console.log("Data Layer Updated: ", { 'queryKey': queryKey, 'queryValue': queryValue });
             }
+        }
+
+        // Function to send GET request using stored query parameters
+        function sendApiRequest() {
+            if (!queryKey || !queryValue) {
+                console.log("No query parameters found.");
+                return;
+            }
+            
+            const apiUrl = `https://httpbin.org/get?${queryKey}=${queryValue}`;
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => console.log("API Response:", data))
+                .catch(error => console.error("Error fetching API:", error));
         }
 
         // Call function on page load
